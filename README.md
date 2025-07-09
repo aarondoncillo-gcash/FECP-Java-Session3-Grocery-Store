@@ -18,3 +18,10 @@
 
 ### Exit
 ![Lab 1 output proof](https://github.com/aarondoncillo-gcash/FECP-Java-Session3-Grocery-Store/blob/main/screenshots/lab%201%20exit.png "Lab 1 output proof")
+
+***
+
+# Name: Ronan Aaron Doncillo
+# Lab 1: Part 2 of 2 Grocery Store Inventory System
+## Screenshot of test case and coverage
+![Lab 1 output proof](https://github.com/aarondoncillo-gcash/FECP-Java-Session3-Grocery-Store/blob/main/screenshots/lab%201%20test%20case.png "Lab 1 output proof")
