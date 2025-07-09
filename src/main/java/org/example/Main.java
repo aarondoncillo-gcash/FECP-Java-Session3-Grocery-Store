@@ -8,53 +8,77 @@ import java.util.Scanner;
 public class Main {
 
     public static String viewInventory(HashMap<String, Integer> products) {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : products.entrySet()) {
-            sb.append(entry.getKey() + " - " + entry.getValue() +  ((entry.getValue() >= 2) ? " pcs\n" : " pc\n"));
+        // if no products in hashmap
+        if (products.isEmpty()) {
+            return "No products available. Please add a product first.\n";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            // print each product and quantity
+            for (Map.Entry<String, Integer> entry : products.entrySet()) {
+                sb.append(entry.getKey() + " - " + entry.getValue() +  ((entry.getValue() >= 2) ? " pcs\n" : " pc\n"));
+            }
+
+            return sb.toString();
         }
-
-        return sb.toString();
-
     }
 
     public static String addProduct(String name, int qty, HashMap<String, Integer> products) {
+        // input quantity validations
+        if (qty <= -1)
+            return "Quantity must be non-negative\n";
         if(!checkProductIfExists(name, products)){
-            products.put(name, qty);
-            return "Product added!";
+            // add data in hashmap
+            products.put(capitalizeKeyName(name), qty);
+            return "Product added!\n";
         } else {
-            return "Product already exist";
+            // if adding an existing product, will replace the old quantity value with a new one
+            products.put(capitalizeKeyName(name), qty);
+            return "Product already exist. Will update its quantity instead\n";
         }
     }
 
-    public static int checkProduct(String name, HashMap<String, Integer> products) {
+    public static String checkProduct(String name, HashMap<String, Integer> products) {
+        // check if product name key exists in hashmap
         if(checkProductIfExists(name, products)){
-            return products.get(name);
+            name = capitalizeKeyName(name);
+            // get the value of the product key
+            return name + " is in stock: " + products.get(name) + "\n";
         } else {
-            return -1;
+            // if user checks a non existing product
+            return "Product not found.\n";
         }
     }
 
-    public static String updateProduct(String name, int newQuantity, HashMap<String, Integer> products){
+        public static String updateProduct(String name, int newQuantity, HashMap<String, Integer> products){
+            // check if product name key exists in hashmap
         if(checkProductIfExists(name, products)){
-            products.replace(name, newQuantity);
-            return "Stock updated!";
+            // input quantity validations
+            if (newQuantity <= -1)
+                return "Quantity must be non-negative\n";
+            // update value of product key
+            products.replace(capitalizeKeyName(name), newQuantity);
+            return "Stock updated!\n";
         } else {
-            return "Stock not updated";
+            // if user updates a non existing product
+            return "Product not found.\n";
         }
 
 
     }
 
     public static String removeProduct(String name,  HashMap<String, Integer> products) {
+        // check if an existing product can be removed
         if(checkProductIfExists(name, products)){
-            products.remove(name);
-            return "Product removed.";
+            //remove the key in hashmap
+            products.remove(capitalizeKeyName(name));
+            return "Product removed.\n";
         } else {
-            return "Product doesn't exist";
+            return "Product not found.\n";
         }
     }
 
     public static boolean checkProductIfExists(String name, HashMap<String, Integer> products) {
+        // check if key is in hashmap
         for (String key : products.keySet()){
             if(key.equalsIgnoreCase(name)){
                 return true;
@@ -63,10 +87,10 @@ public class Main {
         return false;
     }
 
-    public static String capitalize(String str)
+    public static String capitalizeKeyName(String str)
     {
-        if(str == null || str.length()<=1) return str;
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
+        //Capitalize the string key in order to enforce case-insensitive key names
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
 
@@ -74,6 +98,7 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
         HashMap<String, Integer>  products = new HashMap<>();
+        // add existing products
         products.put("Milk", 20);
         products.put("Bread", 15);
         products.put("Eggs", 30);
@@ -90,80 +115,76 @@ public class Main {
             System.out.println("6. Exit");
 
             System.out.print("Choose an option: ");
+            // Get user choice
             choice = sc.nextInt();
             sc.nextLine();
 
             switch (choice) {
+                //View Inventory
                 case 1:
-                {
-                    if(products.isEmpty()) {
-                        System.out.print("No products available");
-                    } else {
-                        System.out.println(viewInventory(products));
-                    }
+                    //print output message
+                    System.out.println(viewInventory(products));
                     break;
-                }
+                //Add Product
                 case 2:
                 {
                     System.out.print("Enter product name: ");
-                    String productName = capitalize(sc.nextLine());
-                    if(!checkProductIfExists(productName, products)) {
-                        System.out.print("Enter quantity: ");
-                        int quantity = sc.nextInt();
-                        sc.nextLine();
-                        System.out.println(addProduct(productName, quantity, products));
-                    } else {
-                        System.out.println("Product already exist");
-                    }
+                    // get product and quantity
+                    String productName = sc.nextLine();
+                    System.out.print("Enter quantity: ");
+                    int quantity = sc.nextInt();
+                    sc.nextLine();
+                    //print output message
+                    System.out.println(addProduct(productName, quantity, products));
                     break;
                 }
+                // Check Product
                 case 3:
                 {
                     System.out.print("Enter product name to check: ");
-                    String productName = capitalize(sc.nextLine());
-                    Integer currentStock = checkProduct(productName, products);
-                    if (currentStock <= -1)
-                        System.out.println("Product doesn't exist");
-                    else {
-                        System.out.println(capitalize(productName) + " is in stock: " + currentStock);
-                    }
+                    //get product
+                    String productName = sc.nextLine();
+                    //print output message
+                    System.out.println(checkProduct(productName, products));
                     break;
-
                 }
+                // Update Stock
                 case 4:
                 {
                     System.out.print("Enter product name to update: ");
-                    String productName = capitalize(sc.nextLine());
+                    // get product name
+                    String productName = sc.nextLine();
                     int newQuantity;
-
-                    if(checkProductIfExists(productName, products)) {
-                        while(true) {
-                            System.out.print("Enter new stock quantity: ");
-                            newQuantity = sc.nextInt();
-                            if (newQuantity >= 0 )
-                                break;
-                        }
-                        sc.nextLine();
-                        System.out.println(updateProduct(productName, newQuantity, products));
-
-                    } else {
-                        System.out.println("Product doesn't exist");
+                    // get and validate input quantity
+                    while(true) {
+                        System.out.print("Enter new stock quantity: ");
+                        newQuantity = sc.nextInt();
+                        if (newQuantity >= 0 )
+                            break;
                     }
+                    sc.nextLine();
+                    // print output message
+                    System.out.println(updateProduct(productName, newQuantity, products));
                     break;
-
-
                 }
+                // Remove Product
                 case 5: {
                     System.out.print("Enter product name to remove: ");
-                    String productName = capitalize(sc.nextLine());
+                    // get product name
+                    String productName = sc.nextLine();
+                    // print output message
                     System.out.println(removeProduct(productName, products));
                     break;
                 }
-
-                default :
+                // Exit
+                case 6:
+                    //break loop and exit
                     keepRunning = false;
                     System.out.println("Exiting system");
                     break;
+
+                default :
+                    System.out.println("Invalid option. Try again\n");
             }
 
         }
